@@ -1,0 +1,116 @@
+import urllib
+import zipfile
+url = "https://files.grouplens.org/datasets/movielens/ml-latest.zip"
+file_name = "data/ml-latest.zip"
+urllib.request.urlretrieve(url, file_name)
+zip_file = zipfile.ZipFile(file_name, 'r')
+zip_file.extractall('data')
+# Inspect the extracted folder
+import os
+os.listdir('data/ml-latest/'))
+# There are two new files. Let's have a look.
+scores = pd.read_csv('data/ml-latest/genome-scores.csv')
+scores.head()
+# These tags show the features of each movie. Not relavant to what we want to do.
+tags = pd.read_csv('data/ml-latest/genome-tags.csv')
+tags.head()
+ratings = pd.read_csv('data/ml-latest/ratings.csv')
+ratings.shape
+movies = pd.read_csv('data/ml-latest/movies.csv')
+movies.head()
+# Find the movie ID for "Pulp Fiction",using movies['title'].str.contains()
+result = movies[movies['title'].str.contains("Pulp Fiction")]
+print(result)
+
+movie_id = 296
+
+ratings_subset = ratings[ratings['movieId'] == movie_id]
+ratings_subset.shape
+# Let's illustrate the rating distribution as a histogram.
+ratings_subset['rating'].hist()
+name = "Last Airbender"
+result = movies[movies['title'].str.contains(name)]
+print(result)
+
+movie_id = 78893
+ratings_subset = ratings[ratings['movieId'] == movie_id]
+print(ratings_subset.shape)
+
+ratings_subset['rating'].hist()
+ratings_subset['rating'].value_counts().plot.bar()
+plt.title("Rating Distribution of The Last Airbender")
+plt.show()
+tags.columns
+# This movie looks bad. What can we know about this movie?
+scores_subset = scores[scores['movieId'] == movie_id]
+print(scores_subset)#[1128 rows x 3 columns]
+scores_subset.sort_values('relevance', ascending=False).merge(tags, on='tagId').head(10)
+#Let's create a function to do the search.
+
+def get_related_tags(movie_name):
+    """
+    Given a movie, return the top-10 related movie tags as a data frame.
+    """
+    movie_record = movies[movies['title'].str.contains(movie_name)]
+    row_index = movie_record.index[0]
+    movie_id = movie_record.loc[row_index, "movieId"]
+    scores_subset = scores[scores['movieId'] == movie_id]
+    scores_sorted = scores_subset.sort_values("relevance", ascending=False)
+    scores_top10 = scores_sorted.head(10)
+    scores_top10 = scores_top10.merge(tags, on="tagId", how="inner")
+    return scores_top10
+results = get_related_tags("Forrest Gump")
+results
+#Find highly rated movies.
+ratings.head()
+rating_groups = ratings.groupby('movieId')
+# Inspect the ratings in the first group
+for key, group in rating_groups:
+    print("Key:", key)
+    print(group)
+    break
+    #[68469 rows x 4 columns]
+# Calculate the average rating value in each group.
+avg_ratings = rating_groups['rating'].mean().to_frame(name="Average Rating")
+avg_ratings.head()
+# Sort the movies by their average ratings.
+avg_ratings.sort_values("Average Rating", ascending=False).head(10)
+# The top movies have perfect average rating, probably due to small sample sizes.
+# Remove movies that recieve too few ratings 
+# Threshold = 10
+
+# Find the number of ratings each movie get.
+# ratings['movieId'].value_counts()
+num_ratings = ratings.groupby('movieId').size().to_frame("Number of Ratings")
+num_ratings.head(10)
+# Combine average ratings with number of ratings.
+movie_data = pd.merge(avg_ratings, num_ratings, left_index=True, right_index=True)
+movie_data.head(10)
+# A lot of movies only has a single rating
+movie_data.sort_values("Number of Ratings").head(20)
+# Let's find out how many movies have fewer than 10 ratings.
+movies_with_few_ratings = movie_data[movie_data['Number of Ratings'] < 10]
+movies_with_few_ratings.shape #(30173, 2)
+# Let's remove these movies from movie_data,using df.index, axis=0
+movie_data = movie_data.drop(movies_with_few_ratings.index, axis=0)
+movie_top20 = movie_data.sort_values('Average Rating', ascending=False).head(20)
+movie_top20
+# Add titles to these rows.
+pd.merge(movie_top20, movies, left_index=True, right_on="movieId")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
