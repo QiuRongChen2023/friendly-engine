@@ -1,0 +1,53 @@
+!pip install folium
+import folium
+import numpy as np
+import  pandas as pd 
+folium.__version__
+m = folium.Map(location=[45.5236, -122.6750])
+m.save('index.html')
+m
+#tooltip = 'Click me!'
+#folium.Marker([45.3288, -121.6625], popup='<i>Mt. Hood Meadows</i>', tooltip=tooltip).add_to(m)
+nyc= folium.Map(location=[40.777,-73.973],zoom_start=10)
+nyc
+
+marker1 = folium.Marker([40.872812151768, -73.89449687404367],
+                        popup="Lehman College",
+                        icon=folium.Icon(color='blue'))
+marker1.add_to(nyc)
+nyc
+
+circle1=folium.Circle(
+radius=2000,
+location=[40.64150660812825, -73.778116862719],
+    popup="JFK",
+    color='red')
+circle1.add_to(nyc)
+nyc
+park = folium.Marker([40.78266435066667, -73.96557267314704],popup="Cental Park",icon=folium.Icon(color='red'))
+park.add_to(nyc)
+nyc
+circle2=folium.Marker([40.77477567591785, -73.88586814811883],
+                     popup='LGA',
+                     icon=folium.Icon(color='purple'))
+circle2.add_to(nyc)
+nyc
+url = 'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data'
+state_geo = f'{url}/us-states.json' # formatted string
+state_unemployment = f'{url}/US_Unemployment_Oct2012.csv'
+state_data = pd.read_csv(state_unemployment)
+
+state_data.head()
+m = folium.Map(location = [48,-102],zoom_start = 3)
+folium.Choropleth(
+geo_data=state_geo,
+name='choropleth',
+data=state_data,
+columns=['State','Unemployment'],
+key_on='feature.id',
+fill_color='YlGn',
+fill_opacity=0.7,
+line_opacity=0.2,
+legend_name='Unemplotment Rate(%)').add_to(m)
+folium.LayerControl().add_to(m)
+m
