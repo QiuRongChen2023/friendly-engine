@@ -1,0 +1,391 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+from datetime import datetime
+
+datetime.now()
+datetime.now().year
+datetime.now().day
+datetime.now().month
+#We can use datetime.timedelta to represent the temporal difference between two datetime objects.
+from datetime import timedelta
+
+delta = timedelta(10)
+
+datetime.now() - delta
+date1 = datetime(2022, 12, 12)
+date2 = datetime.now()
+date2 - date1
+#Convert between string and datetime
+
+#str(date)
+date = datetime(2011, 1, 3, 23, 30, 45)
+str(date)
+# Convert to format "YYYY-MM-DD" using .strftime()
+date.strftime("%Y/%m/%d %H:%M, %A")
+
+#Datetime formats:
+
+# %Y: Four-digit year %y: Two-digit year %m: Two-digit month %d: Two-digit day %H: Hour 0 - 23 %I: Hour 1 - 12 %M: Two-digit minute %S: Second %A: Weekday
+#more on this 
+# https://docs.python.org/2/library/datetime.html
+date.strftime("%m/%d/%Y")
+date.strftime("%m/%d/%Y %H:%M")
+#Parse a datetime string
+
+#Besides pd.to_datetime(), we can use dateutil to parse a string representing date and time.
+#use dateutil
+from dateutil.parser import parse
+parse("2011-01-03")
+parse("Jan 31, 1997 10:45 PM")
+parse("06/12/2011", dayfirst=True)
+parse("06/12/2011"
+
+#Time Series Basics
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+dates = [datetime(2011, 1, 2), datetime(2011, 1, 5),
+         datetime(2011, 2, 7), datetime(2011, 2, 8),
+         datetime(2011, 3, 10), datetime(2011, 3, 12)]
+ts = pd.Series(np.random.randn(6), index=dates)
+ts
+ts['2011-01-05']
+ts[1]
+ts['01/05/2011']
+ts['20110105']
+ts['2011-02-01':'2011-02-8']# the end datetime is also included
+ts['2011-02-07':]
+
+!pip install yfinance
+import yfinance as yf
+tsla = yf.download('TSLA', start="2023-01-01", end="2023-05-02")
+
+tsla.head()
+tsla.mean()
+tsla.max()
+dt=tsla.loc["20230401":"20230430"]
+dt.head()
+dt['Volume'].max()
+dt['Adj Close'].plot.bar()
+plt.figure(figsize=(8,5))
+plt.plot(dt.index,dt['Close'])
+plt.title("Tesla Stock Performance")
+
+dates = [datetime(2011, 1, 2), datetime(2011, 3, 10), datetime(2011, 4, 1)]
+ts[ts.index.isin(dates)]#find out missing indices
+# Create a range of dates
+daterange = pd.date_range('2011-01-01', periods=8)
+print(daterange)
+daterange = pd.date_range('2011-01-01', periods=5, freq='30D')#using freq='30D' to determine diffrence between two records
+print(daterange)
+daterange = pd.date_range("2011-01-01", periods=5, freq="12H")
+print(daterange)
+daterange = pd.date_range("2011-01-01", periods=10, freq="B")# freq="B" Sample business days only
+print(daterange)
+ts[ts.index.isin(daterange)]#ts[daterange] Timestamp not in index", we use ts.index.isin(daterange)
+prices = pd.DataFrame(np.random.randn(4)*10+100,
+                      index=pd.date_range('2019-11-01', periods=4),
+                      columns=['Price'])
+prices
+# How to create a column storing yesterday's price?
+for date in prices.index:
+    yesterday = date - timedelta(days=1)
+    if yesterday in prices.index:
+        prices.loc[date, "Yesterday's Price"] = prices.loc[yesterday, "Price"]
+prices
+prices_yesterday = prices.shift(1)#shift(1)
+prices_yesterday
+prices_beforeyesterday = prices.shift(2)#shift(2)
+prices_beforeyesterday
+#  Calculate how much Tesla's stock price has increased or decreased
+# at the end of each day, compared to previous day's closing price.
+# Formula: difference = today's close price - yesterday's close price
+tsla['prices_yesterday']=tsla['Close'].shift(1)
+tsla.head()
+# Step 1: Add a column of the previous day's close price
+tsla['Previous Close'] = tsla['Close'].shift(1)
+tsla.head()
+# Step 2: Calculate the price difference
+tsla['Price Change'] = tsla['Close'] - tsla['Previous Close']  
+tsla.head()
+num_days_increase=0
+num_days_decrease=0
+for day in tsla.index:
+    if tsla.loc[day,"Price Change"]>0:
+        num_days_increase +=1
+    else:
+        num_days_decrease +=1
+print("Number of days increased:", num_days_increase)
+print("Number of days decreased:", num_days_decrease)
+# Solution 2: Use array arithmetics
+(tsla["Price Change"] > 0).value_counts()
+# On which day the stock price achieved the highest price jump?
+int_index = tsla['Price Change'].argmax()
+tsla.index[int_index]
+tsla.loc['2023-01-24':'2023-01-29']
+# Solution from ChatGPT
+import yfinance as yf
+from datetime import datetime, timedelta
+
+# Set the start and end dates
+start_date = datetime(2023, 1, 1)
+end_date = datetime(2023, 4, 1)
+
+# Retrieve Tesla's stock prices from Yahoo Finance
+tesla_data = yf.download("TSLA", start=start_date, end=end_date)
+###use .diff()  Calculate the daily price changes
+tesla_data['Price Change'] = tesla_data['Close'].diff()
+
+###use .idxmax() Find the day with the highest price jump
+max_price_jump_date = tesla_data['Price Change'].idxmax()
+
+# Print the result
+print("The day with the highest price jump was:", max_price_jump_date.date())
+
+
+# Calculate how much percent has Tesla's price changed each day.
+
+# tsla.head()
+
+# Convert the dollar amount into a percentage.
+# percentage = price change / previous close
+
+tsla['% Change'] = tsla['Price Change'] / tsla['Previous Close'] * 100
+tsla.head()
+# On which days has Tesla price experience the most increase?
+# How much had the price increased on those days?
+
+tsla['% Change'].idxmax()
+# On which day has Tesla price experience the most decrease? How much decrease?
+day_of_most_decrease = tsla['% Change'].idxmin()
+print(day_of_most_decrease)
+print("Price of the day:", tsla.loc[day_of_most_decrease, 'Close'])
+print("% of change:", tsla.loc[day_of_most_decrease, '% Change'])
+
+# This is how ChatGPT handles this task:
+import yfinance as yf
+
+def find_max_drop_date(symbol, year):
+    # Fetch historical stock data for the given symbol and year
+    data = yf.download(symbol, start=f"{year}-01-01", end=f"{year}-12-31")
+    
+    # Calculate the daily price drops
+    data['Drop'] = data['Close'].diff()
+    
+    # Find the date when the stock dropped the most
+    max_drop_date = data['Drop'].idxmin().date()
+    
+    return max_drop_date
+
+# Specify the stock symbol and year
+symbol = 'TSLA'
+year = 2023
+
+# Find the day when Tesla stock dropped the most in 2023
+max_drop_date = find_max_drop_date(symbol, year)
+
+print(f"The day when Tesla stock dropped the most in 2023: {max_drop_date}")
+# Group the rows by the month value of their indices, then aggregate the data.
+
+tsla_2020 = yf.download("TSLA", start="2020-01-01", end="2020-12-31")
+tsla_2020.head()
+# If we only want to create the record for 2020-01, we can extract the data from 
+# that month.
+tsla_202001 = tsla_2020.loc['2020-01']
+
+# Get the monthly open price
+first_day = tsla_202001.index[0]
+print("First trading day in 2020-01:", first_day)
+first_price = tsla_202001.loc[first_day, 'Open']
+print("First price in 2020-01:", first_price)
+
+# Get the monthly close price
+last_day = tsla_202001.index[-1]
+print("Last trading day in 2020-01:", last_day)
+last_price = tsla_202001.loc[last_day, 'Close']
+print("Last price in 2020-01:", last_price)
+
+highest_price = tsla_202001['High'].max()
+lowest_price = tsla_202001['Low'].min()
+total_volume = tsla_202001['Volume'].sum()
+
+print("Highest price in 2020-01:", highest_price)
+print("Lowest price in 2020-01:", lowest_price)
+print("Totla trading volumn in 2020-01:", total_volume)
+
+# Let's add these data to a new data frame
+tsla_monthly = pd.DataFrame(columns=['Open', 'High', 'Low', 'Close', 'Volumn'])
+# tsla_monthly # It is empty at this moment
+
+# Let's add a row for 2020-01:
+tsla_monthly.loc["2020-01", :] = [first_price, highest_price, 
+                            lowest_price, last_price, total_volume]
+
+tsla_monthly
+# Use groupby() to split the data frame into 12 groups
+groups = tsla_2020.groupby(tsla_2020.index.month)
+first_prices = groups['Open'].first()
+last_prices = groups['Close'].last()
+highest_prices = groups['High'].max()
+lowest_prices = groups['Low'].min()
+total_volumes = groups['Volume'].sum()
+
+# set up dataframe
+tsla_monthly = pd.DataFrame({
+    'Open': first_prices,
+    'High': highest_prices,
+    'Low': lowest_prices,
+    'Close': last_prices,
+    'Volume': total_volumes
+})
+
+tsla_monthly
+tsla_monthly.set_index(pd.date_range("2020-01-01", periods=12, freq="1m"),
+                    inplace=True) #set up the date as index
+tsla_monthly
+# Solution by ChatGPT:
+import yfinance as yf
+
+# Specify the stock symbol and year
+symbol = "TSLA"
+year = 2020
+
+# Retrieve the daily stock data for Tesla in 2020
+data = yf.download(symbol, start=f"{year}-01-01", end=f"{year}-12-31")
+
+# Aggregate the dataset to monthly data
+monthly_data = data.resample('M').agg({'Open': 'first', 'High': 'max', 'Low': 'min', 'Close': 'last', 'Volume': 'sum'})
+
+monthly_data.index = monthly_data.index.strftime('%Y-%m')
+
+monthly_data
+
+# Create 10-day moving average use .rolling(10)
+moving_avg = tsla.rolling(10)["Close"].mean()
+
+moving_avg.head(15)
+plt.figure(figsize=(12, 6))
+plt.plot(tsla.index,tsla['Close'],label='Daily Prices')
+plt.plot(moving_avg.index,moving_avg,label='10-day Moving Average')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.legend(['Daily prices', '10-day average'])
+# Solution by ChatGPT
+import yfinance as yf
+import matplotlib.pyplot as plt
+
+# Specify the stock symbol and year
+symbol = 'TSLA'
+year = 2023
+
+# Retrieve the daily stock data for Tesla in 2023
+data = yf.download(symbol, start=f"{year}-01-01", end=f"{year}-12-31")
+
+# Calculate the 10-day moving average
+data['MA10'] = data['Close'].rolling(window=10).mean()
+
+# Plotting the daily prices and the 10-day moving average
+plt.figure(figsize=(12, 6))
+plt.plot(data.index, data['Close'], label='Daily Prices')
+plt.plot(data.index, data['MA10'], label='10-day Moving Average')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.title('Tesla Stock Prices in 2023')
+plt.legend()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
