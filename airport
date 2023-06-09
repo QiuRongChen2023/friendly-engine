@@ -1,0 +1,118 @@
+import pandas as pd
+import requests
+#write a function to download airports.csv
+def download_csv_file():
+   
+    airports_url = 'https://ourairports.com/data/airports.csv'
+    freq_url = 'https://ourairports.com/data/airport-frequencies.csv'
+    countries_url = 'https://ourairports.com/data/countries.csv'
+    regions_url = 'https://ourairports.com/data/regions.csv'
+
+  
+    airports = pd.read_csv(airports_url)
+    airport_frequencies = pd.read_csv(freq_url)
+    countries = pd.read_csv(countries_url)
+    regions = pd.read_csv(regions_url)
+
+ 
+    return airports, airport_frequencies, countries, regions
+    
+file_path = "data/"
+file_name = "airport-frequencies.csv"
+download_csv_file()
+file_path = "data/"
+file_name = "countries.csv"
+download_csv_file(file_path,file_name)
+file_path = "data/"
+file_name = "airports.csv"
+download_csv_file(file_path,file_name)
+file_path = "data/"
+file_name = "regions.csv"
+download_csv_file(file_path,file_name)
+import pandas as pd
+#load the data as four data frames
+airports = pd.read_csv('airports.csv')
+airports.head(5)
+counties = pd.read_csv('countries.csv')
+counties.head(2)
+regions = pd.read_csv('regions.csv')
+regions.head(2)
+airport_freqs = pd.read_csv('https://ourairports.com/data/airport-frequencies.csv')
+airport_freqs.head(2)
+#display the shape,data type and the number of missing values for each column of each data frame
+airports.shape
+airports.dtypes
+print(airports.isnull().sum())
+airport_frequencies.shape
+countries.columns.values
+regions = pd.read_csv('regions.csv')
+regions.head(5)
+us=regions[regions['iso_country']=='US']
+us.head(5)
+# in regions, find the region code for NY
+ny=us[us['local_code']=='NY']
+ny
+#Extract all large airports in New York State from airports
+result=airports[(airports['iso_region']=='US-NY') & (airports['type'] == 'large_airport')]
+print(result)
+#extract location of all large airports in New York State 
+
+locate=result['municipality']
+locate
+!pip install folium
+import folium
+#Find the longitudes and latitudes of these airports using Google Maps. Create a map to display the locations of these airports.
+ny= folium.Map(location=[42.94729269835872, -75.54489042097806],zoom_start=6)
+ny
+
+m_KBUF = folium.Marker([42.93985118296512, -78.7287985987186],
+                        popup="KBUF_airport",
+                        icon=folium.Icon(color='blue'))
+m_KBUF.add_to(ny)
+m_KJFK = folium.Marker([40.64472616250991, -73.78504968612545],
+                       popup="KJFK_airport",
+                      icon=folium.Icon(color='red'))
+m_KJFK.add_to(ny)
+m_KLGA = folium.Marker([40.77729263177812, -73.8737779936961],
+                       popup="KLGA_airport",
+                      icon=folium.Icon(color='green'))
+m_KLGA.add_to(ny)
+m_KSYR = folium.Marker([43.114078911133, -76.11337633941251],
+                       popup="KSYR_airport",
+                       icon=folium.Icon(color='purple'))
+m_KSYR.add_to(ny)
+ny
+#large airport in New York State
+ny_large_airports=airports.loc[(airports['iso_region']=='US-NY') & (airports['type'] == 'large_airport')]
+ny_large_airports
+#From airport_freqs , extract all communication frequencies used by each large airport in New York State
+frequencies_ny = pd.merge(ny_large_airports, airport_freqs,left_on='ident',right_on='airport_ident')
+frequencies_ny.head()
+#Sort the frequencies in asencidng order.
+
+frequencies_ny_large_airports = frequencies_ny.sort_values('frequency_mhz',ascending=False)
+frequencies_ny_large_airports
+ny_large_airports_freqs = frequencies_ny_large_airports[['airport_ident', 'frequency_mhz']]
+
+ny_large_airports_freqs.head()
+#Create a new data frame large_airports by selecting rows from airports related to large airports over the world
+large_airports=airports.loc[(airports['type'] == 'large_airport')]
+large_airports.head(5)
+large_airports.shape
+#Use the groupby mechanic to split large_airports by countries.
+large_airports=large_airports.groupby(large_airports['iso_country'])
+large_airports
+#Calculate the number of large airports in each country.
+
+num_large_airports = large_airports.size()
+num_large_airports
+df_num_large_airports = pd.DataFrame(num_large_airports, columns=['num_large_airports'])
+df_num_large_airports
+#Find the top 5 countries having the most large airports.Display the full country names in your result.
+
+result = pd.merge(df_num_large_airports, countries[['code', 'name']], left_on='iso_country', right_on='code')
+df_result = result[['name', 'num_large_airports']].sort_values('num_large_airports', ascending=False)
+
+df_result
+top_5 = df_result.head(5)
+print(top_5)
