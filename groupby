@@ -1,0 +1,102 @@
+#split the data into groups,and then apply certain calculations to each of the groups, and finally combine all results into a new table, in pandas this is mostly done with groupby() function.
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+df=pd.DataFrame({'Name':['Alice', 'Bob', 'Charlie', 'Alice', 'Bob', 'Charlie'],
+                'Course':['Programming', 'Programming', 'Programming','Data Structure', 'Data Structure','Data Structure',],
+                'Semester':['Spring 2019', 'Fall 2019', 'Fall 2019', 'Spring 2019', 'Fall 2019', 'Spring 2019'],
+                'Homework':np.random.randint(60,100,size=6),
+                'Exam':np.random.randint(60,100,size=6)})
+df
+#"groupby",split exam scores according to name
+g=df['Exam'].groupby(df['Name'])
+#apply mean()function to find the average for each group
+means=g.mean()
+means
+#"to_frame()" can be converted a data series to data frame
+df_mean=means.to_frame()
+df_mean
+df_mean=means.to_frame("Average Exam Score")
+df_mean
+#also, can put all operations in one statement
+df_mean = df['Exam'].groupby(df['Name']).mean().to_frame(name="Average Exam Score")
+df_mean
+df[['Homework', 'Exam']].groupby(df['Course']).mean()
+#already a data frame because they come from more than 1 columns
+# Split the exam scores according to both course name and semester.
+g=df['Exam'].groupby([df['Course'],df['Semester']])
+g
+#also,just use df.groupby but not list,just array[]
+groups = df.groupby(['Course', 'Semester'])
+groups
+means1=g.mean()
+means1
+means2=groups.mean()
+means2
+#unstack()converts a data series with multiple index into a data frame
+means1.unstack()
+means2.unstack()
+means2.unstack(level=0)
+means2.unstack(level=1)
+#one statement create the data frame directly from df
+df['Exam'].groupby([df['Course'],df['Semester']]).mean().unstack()
+#requently the grouping information is found in the same data frame as the data ,
+#simply put down names as the keys
+df.groupby(['Course','Semester']).mean()
+#size() method to find the number of students of each course
+df.groupby(['Course','Semester']).size()
+#count()show the numnber of values in each column
+df.groupby(['Course', 'Semester']).count()
+groups=df.groupby('Name')
+for name,group in groups:
+    print("Name:", name)
+    print("Shape:", group.shape)
+    print(group)
+#selecting columns for groupby
+df.groupby('Name')['Exam'].mean()
+#standard statement
+df['Exam'].groupby(df['Name']).mean()
+# The following statement does not work because 
+# 'Name' is not a column in df['Exam']
+
+# df['Exam'].groupby('Name').mean() # This is a mistake
+genders = {
+    "Alice": "Female",
+    "Bob": "Male",
+    "Charlie": "Male"
+}
+data=df.set_index("Name") #use   .set_index("Name") set up name as index
+data
+#split the data according to gender.gender is not the column in the data,but dictionry had set up
+data.groupby(genders)['Exam'].mean()
+for gender, group in data.groupby(genders):
+    print("Gender:",gender)
+    print(group)
+data.groupby(genders).size()
+#calculate the average for each gender
+data.groupby(genders).mean()
+def get_initial(name):
+    return name[0]
+data.groupby(get_initial).mean()    
+#also can defined via lambda expression
+data.groupby(la)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
