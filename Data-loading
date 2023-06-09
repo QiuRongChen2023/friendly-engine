@@ -1,0 +1,340 @@
+# reading and writing data in text format 1.csv file
+import numpy as np
+import pandas as pd
+
+values = np.array([
+    [100, 80, 95, 'A'],
+    [55, 60, 45, 'F'],
+    [70, 75, 90, 'A'],
+    [75, 70, 60, 'D'],
+    [60, 73, 75, 'C'],
+    [72, 63, -1, 'NA']
+])
+df = pd.DataFrame(values,
+                   columns=['Midterm', 'Project', 'Final', 'LetterGrade'],
+                   index=['Alex', 'Bob', 'Chris', 'Doug', 'Eva', "Frank"])
+df
+
+# write to a csv file using .to_csv()
+import os
+print('Does path "Data/temp/" exist?', os.path.exists("Data/temp/"))
+
+if not os.path.exists("Data/temp"):
+    os.mkdir("Data/temp")
+    print('File path "Data/temp" created.')
+df.to_csv("Data/temp/grades.csv")
+
+# load the csv file using pd.read_csv()
+df2 = pd.read_csv("Data/temp/grades.csv", sep=",")
+df2
+
+# load only the first 3 rows,using nrows=3
+df3 = pd.read_csv("Data/temp/grades.csv", nrows=3)
+df3
+
+# load the file,skipping row 2 and 4,using skiprows=[2,4]
+df4 = pd.read_csv("Data/temp/grades.csv", skiprows=[2, 4])
+df4
+
+# remove column headers from the file,using new column names=[''....],
+# and skip firsts row
+df5 = pd.read_csv("Data/temp/grades.csv", names=[1, 2, 3, 4, 5], skiprows=[0])
+df5
+
+# set first column as index, using index_col=0
+df6 = pd.read_csv("Data/temp/grades.csv", index_col=0)
+df6
+
+# Identify -1 as NaN,using na_values=[]
+df7 = pd.read_csv("Data/temp/grades.csv", na_values=[-1, 72])
+df7
+
+#Load txt file with values separated by spaces
+with open("Data/temp/values.txt", 'w') as file:
+    file.write("Index Category     Value\n")
+    file.write("1            A      2.92\n")
+    file.write("2            B     12.14\n")
+    file.write("3            C    123.56\n")
+# Although read_csv() is still applicable, setting delimiter to a single space will create errors
+df = pd.read_csv("Data/temp/values.txt", sep=" ")
+df    
+
+df = pd.read_csv("Data/temp/values.txt", sep="\s+")
+df
+
+#Load JSON files JavaScript Object Notation (JSON) is a popular file format to storing unstructured data because it is easy for both human and computer to understand.
+Its structure is very similar to Python dictionary Load a json file with json.loads() Writes to a json file with json.dump()
+# json file structure is very similar to Python dictionary
+obj = """
+{"name": "Wes",
+ "places_lived": ["United States", "Spain", "Germany"],
+ "pet": null,
+ "siblings": [{"name": "Scott", "age": 30, "pets": ["Zeus", "Zuko"]},
+              {"name": "Katie", "age": 38,
+               "pets": ["Sixes", "Stache", "Cisco"]}]
+}
+"""
+
+#Load a json file with json.loads()
+import json
+result = json.loads(obj)
+result
+# A JSON object is represented as a python dictionary
+?result
+
+#Writes to a json file with json.dump()
+asjson = json.dumps(result) # Convert back to string
+asjson
+# Use json.dump(object, file) to write the content to file
+with open("Data/temp/People.json", 'w') as file:
+    json.dump(result, file)
+    
+# The with statement is equivalent to the following:
+# file = open("Data/temp/People.json", 'w')
+# json.dump(result, file)
+# file.close()
+# Load from People.json
+with open("Data/temp/People.json", "r") as file:
+    people = json.load(file)
+people
+# Load the content as a data frame
+siblings = pd.DataFrame(result['siblings'], columns=['name', 'age', 'pets'])
+siblings
+
+#Web Scrapping
+# Download a webpage
+import requests
+page = requests.get("http://dataquestio.github.io/web-scraping-pages/simple.html")
+# Show what is downloaded
+print(page.content)
+from bs4 import BeautifulSoup
+soup = BeautifulSoup(page.content, 'html.parser')
+print(soup.prettify())
+# using the children attribute to select all the top-level tags
+list(soup.children)
+# type of each children
+print([type(item) for item in list(soup.children)])
+len(list(html.children))
+p = list(body.children)[1]
+print(p)
+p.get_text()
+# Ex: Extract all the button labels
+
+index_list = [3, 5, 7, 9, 11]
+for i in index_list:
+    button = list(list(list(soup2.children)[0].children)[3])[i]
+    print(button['value'])
+soup = BeautifulSoup(page.content, 'html.parser')
+soup.find_all('input')
+all_buttons = soup.find_all('input')
+for button in all_buttons:
+    print(button['value'])
+# Find all tags of a class
+soup.find_all(class_="first-item")
+
+
+import requests
+from bs4 import BeautifulSoup
+page = requests.get("https://forecast.weather.gov/MapClick.php?lat=40.7146&lon=-74.0071#.Xbc5aXVKhhE")
+soup = BeautifulSoup(page.content, 'html.parser')
+seven_day = soup.find(id="seven-day-forecast")
+#print(len(seven_day))
+#print(seven_day)
+forecast_items = seven_day.find_all(class_="tombstone-container")
+# print(len(forecast_items))
+# print(forecast_items)
+tonight = forecast_items[0]
+print(tonight.prettify())
+# Find today's weather
+
+items = soup.find_all(class_="myforecast-current-lrg")
+items[0].get_text()
+names = soup.find_all(class_="period-name") 
+# This statement creates a list of temperature labels
+names
+# Convert the list of p objects to a list of strings
+days = []
+for obj in names:
+#     print(obj.get_text())
+    days.append(obj.get_text())
+print(days)
+# or can do like that
+days = [obj.get_text() for obj in names]
+print(days)
+temps = soup.find_all(class_="temp")
+# Retrieve all the temperature data
+# Extract the text from each temperature object
+temperatures = [obj.get_text() for obj in temps]
+print(temperatures)
+import numpy as np
+data = np.array([days, temperatures]).T
+# transpose the array so that each list becomes a column,using .T
+data
+import pandas as pd
+# Create a data frame with the days and the temperatures
+df = pd.DataFrame(data, columns=["Day", "Temperature"])
+df
+# Find weather forecast for the week
+period_tags = seven_day.select(".tombstone-container .period-name")
+periods = [pt.get_text() for pt in period_tags]
+periods
+# Find short descriptions and long descriptions for the week
+short_desc_tags = seven_day.select(".tombstone-container .short-desc")
+short_desc_tags
+short_descs = [pt.get_text() for pt in short_desc_tags]
+print(short_descs)
+long_desc_tags = seven_day.select(".tombstone-container .forecast-icon")
+long_desc_tags
+descs = [obj['title'] for obj in long_desc_tags]
+print(descs)
+temp_tags = seven_day.select(".tombstone-container .temp")
+temps = [obj.get_text() for obj in temp_tags]
+# Load the weather data as a data frame
+import pandas as pd
+weather = pd.DataFrame({
+    "period": periods,
+    "short_desc": short_descs,
+    "temp": temps,
+    "desc":descs
+})
+weather
+# extract numeric temperature
+temp_nums = weather["temp"].str.extract("(?P<temp_num>\d+)", expand=False)
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.str.extract.html
+weather["temp_num"] = temp_nums.astype('int')
+weather
+# Identify day temperature from night temperature
+is_night = weather["temp"].str.contains("Low")
+weather["is_night"] = is_night
+weather[is_night]
+
+# Binary File Formats
+# Let's create a data frame first
+import numpy as np
+import pandas as pd
+
+values = np.array([
+    [100, 80, 95, 'A'],
+    [55, 60, 45, 'F'],
+    [70, 75, 90, 'A'],
+    [75, 70, 60, 'D'],
+    [60, 73, 75, 'C'],
+    [72, 63, -1, 'NA']
+])
+df = pd.DataFrame(values,
+                   columns=['Midterm', 'Project', 'Final', 'LetterGrade'],
+                   index=['Alex', 'Bob', 'Chris', 'Doug', 'Eva', "Frank"])
+df
+# Save as a .pickle file
+df.to_pickle("data/data.pickle")
+# Remember that a data frame can also be saved as a csv file
+# The csv file will take more disk space than the pickle file
+df.to_csv("data/data.csv")
+# Load the pickle file
+df_pickle = pd.read_pickle("data/data.pickle")
+df_pickle
+# Besides data frames, we can put other objects in a pickle file.
+#using pickle.dump()
+a = 5
+b = 2.3
+c = True
+
+import pickle
+with open("data/vars.pickle", "wb") as file:
+    pickle.dump(a, file)
+    pickle.dump(b, file)
+    pickle.dump(c, file)
+#read a pickle file using pickle.l
+with open("data/vars.pickle", "rb") as file:
+    b = pickle.load(file)
+    a = pickle.load(file)
+    c = pickle.load(file)
+print(a, b, c)    
+
+#HDF5 The "HDF" stands for "hierarchical data format"
+import pandas as pd
+import numpy as np
+df = pd.DataFrame({
+    'Col1': np.random.randn(100),
+    'Col2': np.random.randn(100)
+})
+df.head(5)
+
+# The PyTable package may require update
+!pip3 install --upgrade tables
+df.to_hdf('data.h5', 'obj1', format='table')
+df_hdf5 = pd.read_hdf('data.h5', 'obj1', where=['index < 3'])
+df_hdf5
+!pip install -U pyarrow
+import time
+start = time.time()
+# df.to_feather('data/data.feather')
+# df.to_pickle('data/data2.pickle')
+# df.to_csv('data/data.csv')
+end = time.time()
+print("Time cost:", (end - start))
+import time
+start = time.time()
+# df_feather = pd.read_feather('data/data.feather')
+# df_pickle = pd.read_pickle('data/data2.pickle')
+df_csv = pd.read_csv('data/data.csv')
+end = time.time()
+print("Time cost:", (end - start))
+# df_feather
+
+#Interacting with Databases In a business setting, most data may not be stored in text or binary files. SQL-based relational databases (such as mySQL) are in wide use.
+# Create a SQLite database
+import sqlite3
+query = """
+CREATE TABLE test
+(a VARCHAR(20), b VARCHAR(20),
+ c REAL,        d INTEGER
+);"""
+con = sqlite3.connect('data.sqlite')
+con.execute(query)
+con.commit()
+# query = """
+# DROP TABLE test
+# """
+# con.execute(query)
+# con.commit()
+# Insert a few rows of data
+data = [('Atlanta', 'Georgia', 1.25, 6),
+        ('Tallahassee', 'Florida', 2.6, 3),
+        ('Sacramento', 'California', 1.7, 5)]
+stmt = "INSERT INTO test VALUES(?, ?, ?, ?)"
+con.executemany(stmt, data)
+con.commit()
+# Select data
+cursor = con.execute('select * from test')
+rows = cursor.fetchall()
+rows
+# Retrieve columns names
+cursor.description
+# Extract column names from description
+
+# Solution 1: use a loop
+desc = cursor.description
+cols = []
+for elt in desc:
+#     print(elt[0])
+    cols.append(elt[0])
+print(cols)
+cols = [elt[0] for elt in cursor.description]
+print(cols)
+# Create a pandas data frame
+columns = [x[0] for x in cursor.description]
+df = pd.DataFrame(rows, columns=columns)
+df
+!pip install sqlalchemy
+import sqlalchemy as sqla
+db = sqla.create_engine('sqlite:///data.sqlite')
+df = pd.read_sql('select * from test', db)
+df
+
+
+
+
+
+    
+    
