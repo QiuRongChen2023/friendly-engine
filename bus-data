@@ -1,0 +1,81 @@
+import pandas as pd
+df=pd.read_csv(r"C:\Users\sandy\OneDrive\Desktop\cmp464\mta_1706.csv.zip",on_bad_lines='skip')
+df.head() #show the dataframe with first 5 datas
+df.shape
+df['RecordedAtTime']=pd.to_datetime(df['RecordedAtTime'])
+df=df[df['RecordedAtTime'].dt.day==1]
+df= df.drop_duplicates()
+df.shape
+Bx26 = df[df['PublishedLineName']=='Bx26']
+Bx26.head()
+rom datetime import datetime
+temp = df.head(3)
+temp['RecordedAtTime'].dt.date
+
+import folium
+
+bx26Map= folium.Map(location=[40.87101179741048, -73.86352516801689],zoom_start=13)
+for row in Bx26.index:
+    bus_location = [Bx26.loc[row,"VehicleLocation.Latitude"],
+                   Bx26.loc[row,"VehicleLocation.Longitude"]]
+    time = Bx26.loc[row,"RecordedAtTime"]
+    folium.Circle(bus_location,radius=0.1,popup=time).add_to(bx26Map)
+bx26Map
+from datetime import datetime
+location = [40.874634210385175, -73.89178270047667]
+time = datetime(2017,6,1,12,14,0)
+print(time)
+Bx26 = Bx26.copy()
+Bx26['TimeDiff']=time-Bx26['RecordedAtTime']
+Bx26.head()
+from datetime import timedelta
+Bx26[Bx26['TimeDiff']>timedelta(0)].sort_values('TimeDiff').head(3)
+df = Bx26[Bx26['TimeDiff']<=timedelta(0)].sort_values('TimeDiff',ascending=False).head(8)
+for row in df.index:
+    bus_location = [df.loc[row,"VehicleLocation.Latitude"],
+                   df.loc[row,"VehicleLocation.Longitude"]]
+    bus_ref = df.loc[row,"VehicleRef"]
+    direction= df.loc[row,"DirectionRef"]
+    folium.Marker(bus_location,popup=direction).add_to(bx26Map)
+bx26Map
+direction = 1
+stop_name = "BEDFORD PK/PAUL AV"
+df = Bx26[(Bx26["NextStopPointName"]== stop_name)&(Bx26["ArrivalProximityText"]=="at stop")]
+df.head()
+Bx26['ArrivalProximityText'].unique()
+#calculate the distance
+import math
+
+def distance(row,lat2,lon2):
+    from math import sin, cos, sqrt, atan2
+
+    R = 6373.0
+    lat1=row['VehicleLocation.Latitude']
+    lon1=row['VehicleLocation.Longitude']
+    lat1=math.radians(lat1)
+    lon1=math.radians(lon1)
+    lat2=math.radians(lat2)
+    lon2=math.radians(lon2)
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = (math.sin(dlat/2))**2 + math.cos(lat1) * math.cos(lat2) * (math.sin(dlon/2))**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    distance = R * c
+    distance=distance*0.621371
+    return distance
+
+index = Bx26.index[0]
+row=Bx26.loc[index,:]
+
+lat2=40.874634210385175
+lon2=-73.89178270047667
+print("distance",distance(row,lat2,lon2))
+# find close one
+Bx26.sort_values('Distance').head()
+lat2=40.874634210385175
+lon2=-73.89178270047667
+threshold = distance(Bx26.loc[142723,:],lat2,lon2)
+threshold
+closeby_records=Bx26[(Bx26['Distance'])<threshold]
+closeby_records
+closeby_records.sort_values("RecordedAtTime")
