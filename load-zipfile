@@ -1,0 +1,81 @@
+import os 
+import urllib.request
+url = "https://files.grouplens.org/datasets/movielens/ml-latest-small.zip"
+
+file_path = "data/"
+zip_file = "ml-latest-small.zip"
+
+if not os.path.exists(file_path):
+    os.mkdir(file_path)
+
+urllib.request.urlretrieve(url, file_path + zip_file)
+import zipfile
+f = zipfile.ZipFile(file_path + zip_file, "r")
+f.printdir()
+f.extractall(file_path)
+f.close()
+#5 comedy movies receive the largest number of ratings
+movies_df['rating'] = ratings_df['rating']
+top_movies = movies_df.sort_values('rating', ascending=False).head(30)
+top_cmovies = top_movies[top_movies['genres'].str.contains('Comedy')]
+top_cmovies.head(10)
+#user gave the most ratings in 2018
+
+ratings_2018 = ratings_df[ratings_df['Year'] == 2018]
+ratings_2018.head()
+# ratings did he/she give in 2018
+
+ratings_2018['rating'].hist()
+#5 drama movies have the highest average rating (do not count movies with less than 10 ratings)
+
+avg_ratings = []
+for movie in movies_df['movieId']:
+    temp = ratings_df[ratings_df['movieId'] == movie]
+    avg_rating = temp['rating'].mean()
+    avg_ratings.append(avg_rating)
+
+num_ratings = []
+for movie in movies_df['movieId']:
+    num_rating = ratings_df[ratings_df['movieId'] == movie].shape[0]
+    num_ratings.append(num_rating)
+
+movies_df['Average_Rating'] = avg_ratings
+movies_df["Number_Ratings"] = num_ratings
+top_dmovies = movies_df[(movies_df['Average_Rating'] > 4.2) & (movies_df['Number_Ratings'] > 30)]
+top_dmovies.head(5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
