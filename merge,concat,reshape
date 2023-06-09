@@ -1,0 +1,243 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+df1 = pd.DataFrame({'key': ['b','b', 'a', 'c', 'a', 'a', 'b'],
+                    'data1': range(7)})
+df1
+df2 = pd.DataFrame({'key': ['a', 'b', 'd'],
+                    'data2': range(3)})
+df2
+df1.merge(df2)
+df2.merge(df1)
+pd.merge(df1, df2)
+df3 = pd.DataFrame({'key': ['a', 'b', 'b'],
+                    'data2': range(3)})
+df3
+df1.merge(df3)
+pd.merge(df1, df2, on='key')
+df1.merge(df3, on='key')
+homework = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Clare'],
+    'Hw1': [100, 90, 80],
+    'Hw2': [60, 70, 80]
+})
+homework
+exam = pd.DataFrame({
+    "Full Name": ['Alice', 'Bob', 'Clare'],
+    "Midterm": [70, 80, 90],
+    "Final": [85, 65, 75]
+})
+exam
+#merge have point out on=""
+pd.merge(homework, exam, left_on="Name", right_on="Full Name")
+homework.merge(exam, left_on="Name", right_on="Full Name")
+homework = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Clare', 'David'],
+    'Hw1': [100, 90, 80, 70],
+    'Hw2': [60, 70, 80, 90]
+})
+homework
+exam = pd.DataFrame({
+    "Full Name": ['Alice', 'Bob', 'Clare', 'Eli'],
+    "Midterm": [70, 80, 90, 100],
+    "Final": [85, 65, 75, 55]
+})
+exam
+pd.merge(homework, exam,
+         left_on="Name",
+         right_on="Full Name")
+pd.merge(homework, exam, left_on="Name", right_on="Full Name",
+         how='outer')
+pd.merge(homework, exam, left_on="Name", right_on="Full Name",
+         how='inner')
+pd.merge(homework, exam,
+         left_on="Name",
+         right_on="Full Name",
+         how="left")
+
+pd.merge(homework, exam,
+         left_on="Name",
+         right_on="Full Name",
+         how="right")
+
+homework = pd.DataFrame({
+    'Semester': ['Fall 2018', 'Fall 2018', 'Fall 2019', 'Fall 2019'],
+    'Name': ['Alice', 'Bob', 'Clare', 'Alice'],
+    'Hw1': [50, 90, 80, 70],
+    'Hw2': [60, 70, 80, 90]
+})
+homework
+exam = pd.DataFrame({
+    'When': ['Fall 2018', 'Fall 2018', 'Fall 2019', 'Fall 2019'],
+    "Name": ['Alice', 'Bob', 'Clare', 'Alice'],
+    "Midterm": [60, 80, 90, 100],
+    "Final": [45, 65, 75, 55]
+})
+exam
+pd.merge(homework, exam, on='Name')
+pd.merge(homework, exam, left_on=['Semester', 'Name'],
+         right_on=['When', 'Name'])
+pd.merge(homework, exam, left_on=['Semester', 'Name'],
+         right_on=['Name','When'])## order matters
+#          right_on=["Name", "When"])
+exam2 = exam.copy()#will not change df exam
+exam2.columns = ["Semester", "Name", "Midterm", "Final"]
+exam2
+pd.merge(homework, exam2, on=['Semester', 'Name'])
+homework.merge(exam2, on=['Semester', 'Name'])
+homework = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Clare', 'David'],
+    'Hw1': [100, 90, 80, 70],
+    'Hw2': [60, 70, 80, 90],
+    'Average': [80, 80, 80, 80]
+})
+homework
+
+exam = pd.DataFrame({
+    "Name": ['Alice', 'Bob', 'Clare', 'Eva'],
+    "Midterm": [60, 80, 90, 100],
+    "Final": [45, 65, 75, 55],
+    "Average": [52.5, 72.5, 82.5, 77.5]
+})
+exam
+pd.merge(homework, exam,on='Name')
+pd.merge(homework, exam, on='Name', how='left')
+#Different join types with how argument
+
+#inner: Use only the keys combinations observed in both tables
+#outer: Use all possible keys combinations
+#right: Use all keys found in the second data frame
+pd.merge(homework, exam, on='Name', how='right')
+pd.merge(homework, exam, on='Name', how='outer')
+pd.merge(homework, exam, on='Name', suffixes=('_hw', '_ex'), how='outer')
+homework = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Clare', 'David'],
+    'Hw1': [100, 90, 80, 70],
+    'Hw2': [60, 70, 80, 90],
+    'Average': [80, 80, 80, 80]
+}, index=[111, 222, 333, 444])
+homework
+exam = pd.DataFrame({
+    "Name": ['Alice', 'Bob', 'Clare', 'Eva'],
+    "Midterm": [60, 80, 90, 100],
+    "Final": [45, 65, 75, 55],
+    "Average": [52.5, 72.5, 82.5, 77.5]
+})
+exam = exam.set_index('Name')
+exam
+pd.merge(homework, exam,on='Name')
+pd.merge(homework, exam, left_on='Name', right_index=True)
+
+
+
+arr1 = np.arange(12).reshape([3, 4])
+print(arr1)
+arr2 = np.arange(15).reshape([3,5])
+print(arr2)
+print(np.hstack([arr1, arr2]))#The function np.hstack() concatenate two arrays horizontally.
+arr3 = np.arange(100, 10, -10).reshape([3, 3])# mean:from 100 include 100, to 10,but not include 10,each number less 10,reshape to 3rows 3 columns
+print(arr3)
+spring_records = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Clare', 'David'],
+    'Homework': [60, 70, 80, 90],
+    'Exam': [65, 75, 85, 95]
+})
+spring_records
+fall_records = pd.DataFrame({
+    'Name': ['Alice', 'Eva', 'Fred', 'Gabriel'],
+    'Homework': [66, 77, 88, 99],
+    'Exam': [69, 79, 89, 99]
+})
+fall_records
+pd.concat([spring_records, fall_records])#concat just simple combin two record
+pd.merge(spring_records, fall_records,on='Name',how='outer')#merge() will merge records on on='',even how ='outer',it merging
+pd.concat([spring_records, fall_records], axis=0)#concat() if axis=0,2 record just vertically put together
+pd.concat([spring_records, fall_records], axis=1)#concat() if axis=0,2 record just horizontally put together
+import numpy as np
+import pandas as pd
+
+values = np.array([
+    [100, 80, 95, 'A'],
+    [55, 60, 45, 'F'],
+    [70, 75, 90, 'A'],
+    [75, 70, 60, 'D'],
+    [60, 73, 75, 'C'],
+    [72, 63, -1, 'NA']
+])
+df = pd.DataFrame(values,
+                   columns=['Midterm', 'Project', 'Final', 'LetterGrade'],
+                   index=['Alex', 'Bob', 'Chris', 'Doug', 'Eva', "Frank"])
+df
+d=df['LetterGrade']
+d
+d.value_counts()
+import numpy as np
+import pandas as pd   
+
+df = pd.DataFrame({'Name' : ['Alice', 'Bob', 'Charlie', 'Alice', 'Bob', 'Charlie'],
+                   'Course' : ['Programming', 'Programming', 'Programming','Data Structure', 'Data Structure','Data Structure',],
+                   'Semester': ['Spring 2019', 'Fall 2019', 'Fall 2019', 'Spring 2019', 'Fall 2019', 'Spring 2019'],
+                   'Homework' : np.random.randint(60, 100, size=6),
+                   'Exam' : np.random.randint(60, 100, size=6)})
+df
+groups=df['Exam'].groupby(df['Name'])
+groups
+means=groups.mean()
+means
+df_means=means.to_frame(name='Ave')
+df_means =df['Exam'].groupby(df['Name']).mean().to_frame(name='Ave')
+
+df_means
+df[['Homework','Exam']].groupby(df['Course']).mean()
+means=df['Exam'].groupby([df['Course'],df['Semester']]).mean()
+df_means = means.to_frame(name='Average Exam Score')
+df_means
+means.index
+means.unstack()
+means.unstack(level=0)
+df.groupby([df['Course'], df['Semester']]).mean()
+df.groupby(['Course', 'Semester']).mean()
+
+df.groupby(['Course', 'Semester']).size()
+df.groupby(['Course', 'Semester']).count()
+groups = df.groupby('Name')
+
+for name, group in groups:
+    print("Name:", name)
+    print(group)
+
+groups['Exam'].mean()
+df.groupby('Semester')['Homework'].mean()
+df.groupby('Semester').mean()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
