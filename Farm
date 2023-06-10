@@ -1,0 +1,174 @@
+
+/*
+*Name:Qiurong Chen
+*Description: This is homework 8-2.
+*Required are to Create a class to represent an 
+*object of type fARM using the description provided below in UML 
+*Date created: 05/10/2023
+*Email: qiurong.chen@lc.cuny.edu
+*/
+
+public class Farm {
+	 private Animal[] animals = new Animal[10];
+	 private String farmName = "";
+	 private int numAnimals =0;
+	 
+	 public Farm() {
+		 farmName = "Farm";
+		 numAnimals = 0;
+		 animals = new Animal[10];
+	    }
+	 public Farm(String farmName) {
+		 this.farmName = farmName;
+		 numAnimals = 0;
+	     animals = new Animal[10];
+	    }
+	    
+	 public Farm(int size) {
+	     farmName = "Farm";
+	     numAnimals = 0;
+	     animals = new Animal[size];
+	    }
+	    
+	 public Farm(String farmName, int size,int numAnimals) {
+	     this.farmName = farmName;
+	     numAnimals = 0;
+	     animals = new Animal[size];
+	    }
+	 public void addAnimal(Animal animal) {
+		 if(numAnimals<animals.length) {
+			 animals[numAnimals]=animal;
+			 numAnimals++;
+		 }
+	 }
+	 public String getFarmName() {
+		 return farmName;
+	 }
+	 public void setFarmName(String farmName) {
+		 this.farmName=farmName;
+	 }
+	 public Animal getAnimal(int index) {
+		 if(index>=0&&index<numAnimals) {return animals[index];
+		}
+		 else {
+			 return null;
+		 }
+}
+	 public int getNumAnimals() {
+		 return numAnimals;
+	 }
+	 public Animal getFirstAnimal() {
+		 if(numAnimals>0) {
+			 return animals[0];
+		 }
+		 else {
+			 return null;
+		 }
+	 }
+	 public Animal getLastAnimal() {
+		 if(numAnimals>0) {
+			 return animals[numAnimals -1];
+		 }
+		 else {
+			 return null;
+		 }
+	 }
+	 public Animal[] getAnimals() {
+		
+		 return animals;
+	 }
+	 public void printAllDetails() {
+		 System.out.printf("FarmName: %20s |Number of Animal: %4d|"
+		 		+ "Farm Size: %4d\n",
+		 		farmName,numAnimals,animals.length);
+		 for(int i=0;i<numAnimals;i++) {
+			 animals[i].printDetails();
+		 } 
+	 }
+	 public Animal removeAnimal(int index) { 
+	 if(index <0 || index >= numAnimals) {
+		 return null;
+	 }else {
+		 Animal removeAnimal = animals[index];
+		 for(int i =index;(i<numAnimals)&&(i<animals.length);i++) {
+			 animals[i]=animals[i+1];
+		 }
+		 numAnimals--;
+		 return removeAnimal;
+		 }
+	
+	 }
+	 public void removeAllAnimals() {
+		 for(int i=0;i<numAnimals;i++) {
+			 animals[i]=null;
+		 }
+		 numAnimals=0;
+	 }
+	 public double getTotalWeightOfAllAnimals() {
+		 double totalWeight=0.0;
+		 for(int i =0;i<numAnimals;i++) {
+			 totalWeight+=animals[i].getWeight();
+		 }
+		 return totalWeight;
+	 }
+	 public double getAverageWeightOfAllAnimals() {
+		 if(numAnimals>0) {
+			 double averageWeight = getTotalWeightOfAllAnimals()/numAnimals;
+			 return averageWeight;
+		 }
+		 return 0.0;
+	 }
+	 public int getNumberOfAnimalsAboveWeight(double weight) {
+		 int count=0;
+		 for(int i=0;i<numAnimals;i++) {
+			 if(animals[i].getWeight()>weight){
+				 count++;
+			 }
+		 }
+		 return count;
+	 }
+	 public int getNumberOfAnimalsBelowWeight(double weight) {
+		 int count=0;
+		 for(int i=0;i<numAnimals;i++) {
+			 if(animals[i].getWeight()<weight){
+				 count++;
+			 }
+		 }
+		 return count;
+	 }
+	 public void increaseWeightOfAllAnimals() {
+		 for(int i=0;i<numAnimals;i++) {
+			 animals[i].gainWeight();
+		 }
+	 }
+	 public void increaseWeightOfAllAnimals(double amount) {
+		 for(int i=0;i<numAnimals;i++) {
+			 animals[i].gainWeight(amount);
+		 }
+		 }
+	  public void diplayFarm1(){
+		System.out.println(this.farmName);
+		for(int i  =0; i<numAnimals;i++) {
+			animals[i].display();
+		}
+	
+	 }
+}
+public class Driver {
+	public static void main(String[] args) {
+		Farm farm1=new Farm("FarmName:          farm of ten | Number of Animals:    5 |  Farm Size: 10");
+		
+		Animal a1 = new Animal("cow",2012,1000.50,'f');
+		Animal a2 = new Animal("pig",2009,550.50,'m');
+		Animal a3 = new Animal("donkey",1999,773.42,'m');
+		Animal a4 = new Animal("sheep",2016,164.23,'f');
+		Animal a5 = new Animal("goose",2004,10.75,'f');
+		farm1.addAnimal(a1);    
+		farm1.addAnimal(a2);
+		farm1.addAnimal(a3);
+		farm1.addAnimal(a4);
+		farm1.addAnimal(a5);
+		farm1.diplayFarm1();
+		  }
+		
+	}
