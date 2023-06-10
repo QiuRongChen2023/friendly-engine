@@ -1,0 +1,216 @@
+/*
+ *Name:Qiurong Chen
+ *Description: This is Project 1.
+ *Required are to Write a Java program that reate a basic console based calculator program.
+ *Date created: 3/24/2023
+ *the video link is:
+ *Email: qiurong.chen@lc.cuny.edu
+ */
+import java.util.Scanner;
+
+public class MyCalculator {
+
+
+	public static void main(String[] args) {
+		String starOverAgain="";
+		String operation = "";
+		String correctOperation = "+,-,*,/,sin,cos,tan";
+		double result=0;
+		String calculatorMode;
+		double num;
+		double x;
+		
+		Scanner scan = new Scanner(System.in);
+
+		do {
+			do {
+			System.out.println("Enter the calculator mode: Standard/Scientific?");
+			calculatorMode = scan.next();}
+			while(!calculatorMode.equals("Standard")&&!calculatorMode.equals("Scientific"));
+			/*
+			 * what happens when the calculation mode is wroing?
+			 */
+			
+			
+
+			if (calculatorMode.equals("Standard")) {
+				System.out.println("The calculator will operate in standard mode.");
+				System.out.println("Enter '+' for addition, '-' for subtractions, '*' for multiplication, '/' for division");
+				operation = scan.next();
+
+				while(!operation.equals("+")&&
+
+						!operation.equals("-")&&
+						!operation.equals("*")&&
+						!operation.equals("/")) {
+					System.out.println("Invalid operator "+operation);
+					System.out.println("Enter '+' for addition, '-' for subtractions, '*' for multiplication, '/' for division");
+
+					operation = scan.next();
+				}
+				
+				
+				
+				if(operation.equals("+")){
+					System.out.println("How many numbers do you want to add?");
+					int nums = scan.nextInt();
+					System.out.println("Enter "+nums+" numbers");
+					result =0;
+					int count= 1;
+					while(count <= nums) {
+						num = scan.nextDouble();
+						result =result  + num;
+						count++;
+					}
+				}
+				else if(operation.equals("-")) {
+					System.out.println("How many numbers do you want to subtract?");
+					int nums = scan.nextInt();
+					System.out.println("Enter "+nums+" numbers");
+					num = scan.nextDouble();
+					result  = num;
+					int count= 1;
+					while(count < nums) {
+						num = scan.nextDouble();
+
+						result  = result - num;
+						count++;
+					}
+				}
+				else if(operation.equals("*")) {
+					System.out.println("How many numbers do you want to multiply?");
+					int nums = scan.nextInt();
+					System.out.println("Enter "+nums+" numbers");
+					result=1;
+					int count= 1;
+					while(count <= nums) {
+						num = scan.nextDouble();
+						result =result * num;
+						count++;
+					}
+				}
+				else if(operation.equals("/")) {
+					System.out.println("How many numbers do you want to divide?");
+					int nums = scan.nextInt();
+					System.out.println("Enter "+nums+" numbers");
+					num = scan.nextDouble();
+					result = num;
+					int count= 1;
+					while(count < nums) {
+						num = scan.nextDouble();
+
+						result=result / num;
+						count++;
+					}
+				}	
+			}
+
+			else {
+				
+			//while(!calculatorMode.equals("Scientific"))		
+                // this needs to be fixed like the one for standard
+				
+				{
+					System.out.println("The calculator will operate in scientific mode.");
+					System.out.println("Enter '+' for addition, '-' for subtractions, '*' for multiplication, '/' for division, "
+							+ "'sin' for sin x, 'cos' for cos x, 'tan' for tan x:");
+					}
+				operation = scan.next();
+				
+				
+				while(!operation.equals("+")&&
+						!operation.equals("-")&&
+						!operation.equals("*")&&
+						!operation.equals("/")&&
+						!operation.equals("sin")&&
+						!operation.equals("cos")&&
+						!operation.equals("tan")) {
+					System.out.println("Invalid operator "+operation);
+					System.out.println("Enter '+' for addition, '-' for subtractions, '*' for multiplication, '/' for division"
+							+ "'sin' for sin x, 'cos' for cos x, 'tan' for tan x:");
+
+					operation = scan.next();
+				}
+
+				if(operation.equals("+")){
+					System.out.println("How many numbers do you want to add?");
+					int nums = scan.nextInt();
+					System.out.println("Enter "+nums+" numbers");
+					result=0;
+					int count= 1;
+
+					while(count <= nums) {
+						num = scan.nextDouble();
+						result =result + num;
+						count++;
+					}	
+
+				}
+
+				else if(operation.equals("-")) {
+					System.out.println("How many numbers do you want to subtract?");
+					int nums = scan.nextInt();
+					System.out.println("Enter "+nums+" numbers");
+					num = scan.nextDouble();
+					result = num;
+					int count= 1;
+
+					while(count < nums) {
+						num = scan.nextDouble();
+						result =result - num;
+						count++;
+					}
+				}
+				else if(operation.equals("*")) {
+					System.out.println("How many numbers do you want to multiply?");
+					int nums = scan.nextInt();
+					System.out.println("Enter "+nums+" numbers");
+					result=1;
+					int count= 1;
+
+					while(count <= nums) {
+						num = scan.nextDouble();
+						result =result* num;
+						count++;	
+					}
+				}
+				else if(operation.equals("/")) {
+					System.out.println("How many numbers do you want to divide?");
+					int nums = scan.nextInt();
+					System.out.println("Enter "+nums+" numbers");
+					num = scan.nextDouble();
+					result = num;
+					int count= 1;
+					while(count < nums) {
+						num = scan.nextDouble();
+						result =result / num;
+						count++;
+					}
+				}
+				else if(operation.equals("sin")) {
+					System.out.println("Enter a number in radians to find the sine");
+					x =scan.nextDouble();
+					result = Math.sin(x);
+				}
+				else if(operation.equals("cos")){
+					System.out.println("Enter a number in radians to find the cosine");
+					x =scan.nextDouble();
+					result =Math.cos(x);
+				}
+				else if(operation.equals("tan")){
+					System.out.println("Enter a number in radians to find the tangent");
+					x =scan.nextDouble();
+					result=Math.tan(x);
+				}
+			}	
+
+
+			System.out.println("Result: " + result);
+
+
+			System.out.println("Do you want to start over? (Y/N)");
+			starOverAgain = scan.next();
+		}while(starOverAgain.equals("Y"));
+		System.out.println("Goodbye");
+	}
+}
